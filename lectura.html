@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+  </head>
+  <body>
+    <div class="input-group">
+      Día: <input type="number" id="dia" name="fname">
+      <div class="buttons" style="padding-top:10px">
+        <button id="set1" data-id="1" onclick="myFunction(this)">Set 1</button>
+        <button id="set2" data-id="2" onclick="myFunction(this)">Set 2</button>
+        <button id="set3" data-id="3" onclick="myFunction(this)">Set 3</button>
+      </div>
+    </div>
+    <div class="container">
+      <img src="" class="image" id="image" alt="">
+      <p id="word" class="word"></p>
+      <img src="" alt="">
+      <p id="error"></p>
+    </div>
+
+    <script type="text/javascript">
+      function buttonStatus(status){
+        $("#set1").attr('disabled', status);
+        $("#set2").attr('disabled', status);
+        $("#set3").attr('disabled', status);
+      }
+      function myFunction(d){
+        buttonStatus(true)
+
+        set1 = ["mama", "papa", "pablo", "sofia", "luisi", "ana ", "jos", "javier", "joaquin"];
+        set2 = ["rojo", "rosa", "naranja", "amarilla", "púrpura", "verde", "azul", "marrón", "vino"];
+        set3 = ["abeja", "águila", "araña", "avispa", "ballena", "bisonte", "búfalo", "burro", "vaca"];
+
+        dia = parseInt($("#dia").first().val())
+        set_num = parseInt(d.getAttribute("data-id"))
+        console.log("Día: " + dia)
+        if (isNaN(dia)) {
+          errorHandeler('Invalid', 'Número introducido inválido')
+          buttonStatus(false)
+          return false
+        }
+        if (dia > set3.length-5) {
+          errorHandeler('Error', 'El número no puede ser mayor al numero de dias - 5')
+          buttonStatus(false)
+          return false
+        }
+        if (dia == 0) {
+          errorHandeler('Invalid', 'El número no puede ser 0')
+          buttonStatus(false)
+          return false
+        }
+
+        day_set1 = set1.slice(dia-1, dia+4)
+        day_set2 = set2.slice(dia-1, dia+4)
+        day_set3 = set3.slice(dia-1, dia+4)
+        console.log("Start...");
+        switch (set_num) {
+          case 1:
+           word_loop(day_set1, 'set1')
+            break;
+          case 2:
+           word_loop(day_set2, 'set2')
+            break;
+          case 3:
+           word_loop(day_set3, 'set3')
+            break;
+          default:
+        }
+      }
+
+      function word_loop(word_set, set_name) {
+        console.log(word_set);
+        counter = 0
+        set_length = word_set.length
+        var myVar = setInterval(function () {
+          if (counter < set_length){
+            index = Math.floor(Math.random() * word_set.length)
+            console.log(word_set[index]);
+            $(".container").fadeOut(400, function () {
+              $("#word").text(word_set[index]);
+              $('#image').attr('src', `imagenes/${set_name}/${word_set[index]}.png`)
+              $(this).fadeIn(400, function () {
+                word_set.splice(index, 1)
+              });
+            });
+            counter++;
+          } else {
+            $(".container").fadeOut(400)
+            clearInterval(myVar);
+            buttonStatus(false)
+          }
+        }, 2000);
+      }
+
+      function errorHandeler(text, error) {
+        $("#word").text(text);
+        $("#error").text(error);
+      }
+    </script>
+  </body>
+</html>
