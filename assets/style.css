@@ -1,7 +1,7 @@
 
 html, body {
   height:100vh;
-  font-family: "QuickSand";
+  font-family: "Quicksand";
   font-weight: 600;
   background-color: #f7fafd
 }
@@ -42,7 +42,7 @@ input[type=checkbox] + label:before {
 }
 
 .buttons button {
-  font-family: "QuickSand";
+  font-family: "Quicksand";
   font-weight: 600;
   background-color: #4CAF50;
   border: none;
