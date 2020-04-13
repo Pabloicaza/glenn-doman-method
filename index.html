@@ -5,15 +5,19 @@
     <title></title>
     <link rel="stylesheet" href="assets/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Quicksand" />
   </head>
   <body>
     <div class="input-group">
       Día: <input type="number" id="dia" name="fname">
       <div class="buttons" style="padding-top:10px">
-        <button id="set1" data-id="1" onclick="myFunction(this)">Set 1</button>
-        <button id="set2" data-id="2" onclick="myFunction(this)">Set 2</button>
-        <button id="set3" data-id="3" onclick="myFunction(this)">Set 3</button>
+        <button id="set1" data-id="1" onclick="set_action(this)">Set 1</button>
+        <button id="set2" data-id="2" onclick="set_action(this)">Set 2</button>
+        <button id="set3" data-id="3" onclick="set_action(this)">Set 3</button>
+      </div>
+      <div class="buttons-images" style="padding-top:10px">
+        <button id="set4" data-id="4" onclick="set_action(this)">Set 1</button>
+        <button id="set5" data-id="5" onclick="set_action(this)">Set 2</button>
+        <button id="set6" data-id="6" onclick="set_action(this)">Set 3</button>
       </div>
     </div>
     <div class="container">
@@ -24,57 +28,49 @@
     </div>
 
     <script type="text/javascript">
-      function buttonStatus(status){
-        $("#set1").attr('disabled', status);
-        $("#set2").attr('disabled', status);
-        $("#set3").attr('disabled', status);
-      }
-      function myFunction(d){
+      function set_action(d){
         buttonStatus(true)
-
-        set1 = ["mama", "papa", "pablo", "sofia", "luisi", "ana ", "jos", "javier", "joaquin"];
-        set2 = ["rojo", "rosa", "naranja", "amarilla", "púrpura", "verde", "azul", "marrón", "vino"];
-        set3 = ["abeja", "águila", "araña", "avispa", "ballena", "bisonte", "búfalo", "burro", "vaca"];
 
         dia = parseInt($("#dia").first().val())
         set_num = parseInt(d.getAttribute("data-id"))
-        console.log("Día: " + dia)
-        if (isNaN(dia)) {
-          errorHandeler('Invalid', 'Número introducido inválido')
-          buttonStatus(false)
-          return false
-        }
-        if (dia > set3.length-5) {
-          errorHandeler('Error', 'El número no puede ser mayor al numero de dias - 5')
-          buttonStatus(false)
-          return false
-        }
-        if (dia == 0) {
-          errorHandeler('Invalid', 'El número no puede ser 0')
-          buttonStatus(false)
-          return false
-        }
 
-        day_set1 = set1.slice(dia-1, dia+4)
-        day_set2 = set2.slice(dia-1, dia+4)
-        day_set3 = set3.slice(dia-1, dia+4)
+        var sets = {
+          'set1': ["mama", "papa", "pablo", "sofia", "luisi", "ana ", "jos", "javier", "joaquin"].slice(dia-1, dia+4),
+          'set2': ["rojo", "rosa", "naranja", "amarilla", "púrpura", "verde", "azul", "marrón", "vino"].slice(dia-1, dia+4),
+          'set3': ["abeja", "águila", "araña", "avispa", "ballena", "bisonte", "búfalo", "burro", "vaca"].slice(dia-1, dia+4),
+          'set4': [...Array(24).keys()].slice(dia, dia+5), // numero de imagenes en el folder del set
+          'set5': [...Array(24).keys()].slice(dia, dia+5), // numero de imagenes en el folder del set
+          'set6': [...Array(24).keys()].slice(dia, dia+5), // numero de imagenes en el folder del set
+        };
+        if (!errorHandeler(dia, sets['set' + set_num].length)) return false;
+
+        display_image = displayimage(set_num)
+
         console.log("Start...");
-        switch (set_num) {
-          case 1:
-           word_loop(day_set1, 'set1')
-            break;
-          case 2:
-           word_loop(day_set2, 'set2')
-            break;
-          case 3:
-           word_loop(day_set3, 'set3')
-            break;
-          default:
+        item_loop(sets['set' + set_num], 'set' + set_num, display_image)
+      }
+
+      function displayimage(set_num) {
+        if (set_num > 0 && set_num <= 3){
+          return false
+        } else {
+          $('#image').css( "display", "block" )
+          $("#word").css( "font-size", "10px" )
+          $("#word").css( "margin", "50px" )
+          return true
         }
       }
 
-      function word_loop(word_set, set_name) {
+      function buttonStatus(status){
+        for (var i = 1; i <= 6; i++) {
+          $(`#set${i}`).attr('disabled', status);
+        }
+      }
+
+      function item_loop(word_set, set_name, display_image) {
         console.log(word_set);
+        console.log("Display images", display_image);
+
         counter = 0
         set_length = word_set.length
         var myVar = setInterval(function () {
@@ -83,7 +79,9 @@
             console.log(word_set[index]);
             $(".container").fadeOut(400, function () {
               $("#word").text(word_set[index]);
-              $('#image').attr('src', `imagenes/${set_name}/${word_set[index]}.png`)
+              if (display_image){
+                $('#image').attr('src', `imagenes/${set_name}/${word_set[index]}.jpg`)
+              }
               $(this).fadeIn(400, function () {
                 word_set.splice(index, 1)
               });
@@ -94,13 +92,34 @@
             clearInterval(myVar);
             buttonStatus(false)
           }
-        }, 2000);
+        }, 1000);
       }
 
-      function errorHandeler(text, error) {
+      function errorHandeler(dia, set_length) {
+        console.log("Día: " + dia)
+        if (isNaN(dia)) {
+          errorMessage('Invalid', 'Número introducido inválido')
+          buttonStatus(false)
+          return false
+        }
+        if (set_length < 5) {
+          errorMessage('Error', 'El número no puede ser mayor al numero de dias - 5')
+          buttonStatus(false)
+          return false
+        }
+        if (dia == 0) {
+          errorMessage('Invalid', 'El número no puede ser 0')
+          buttonStatus(false)
+          return false
+        }
+        return true
+      }
+
+      function errorMessage(text, error) {
         $("#word").text(text);
         $("#error").text(error);
       }
+
     </script>
   </body>
 </html>
